@@ -11,4 +11,4 @@ model_evaluation.py
 model_evaluation_results.txt
 
 #claude
-/.claude/
+.claude/
