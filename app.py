@@ -1,163 +1,5 @@
-# import gradio as gr
-# from brain_2 import predict_crop_yield
-
-# # Crop list
-# crops = [
-#     "Arecanut",
-#     "Arhar/Tur",
-#     "Bajra",
-#     "Banana",
-#     "Barley",
-#     "Black pepper",
-#     "Cardamom",
-#     "Cashewnut",
-#     "Castor seed",
-#     "Coconut",
-#     "Coriander",
-#     "Cotton(lint)",
-#     "Cowpea(Lobia)",
-#     "Dry chillies",
-#     "Garlic",
-#     "Ginger",
-#     "Gram",
-#     "Groundnut",
-#     "Guar seed",
-#     "Horse-gram",
-#     "Jowar",
-#     "Jute",
-#     "Khesari",
-#     "Linseed",
-#     "Maize",
-#     "Masoor",
-#     "Mesta",
-#     "Moong(Green Gram)",
-#     "Moth",
-#     "Niger seed",
-#     "Oilseeds total",
-#     "Onion",
-#     "Other Cereals",
-#     "Other Kharif pulses",
-#     "Other Rabi pulses",
-#     "Other Summer Pulses",
-#     "other oilseeds",
-#     "Peas & beans (Pulses)",
-#     "Potato",
-#     "Ragi",
-#     "Rapeseed &Mustard",
-#     "Rice",
-#     "Safflower",
-#     "Sannhamp",
-#     "Sesamum",
-#     "Small millets",
-#     "Soyabean",
-#     "Sugarcane",
-#     "Sunflower",
-#     "Sweet potato",
-#     "Tapioca",
-#     "Tobacco",
-#     "Turmeric",
-#     "Urad",
-#     "Wheat"
-# ]
-
-# # State list
-# states = [
-#     "Andhra Pradesh",
-#     "Arunachal Pradesh",
-#     "Assam",
-#     "Bihar",
-#     "Chhattisgarh",
-#     "Delhi",
-#     "Goa",
-#     "Gujarat",
-#     "Haryana",
-#     "Himachal Pradesh",
-#     "Jammu and Kashmir",
-#     "Jharkhand",
-#     "Karnataka",
-#     "Kerala",
-#     "Madhya Pradesh",
-#     "Maharashtra",
-#     "Manipur",
-#     "Meghalaya",
-#     "Mizoram",
-#     "Nagaland",
-#     "Odisha",
-#     "Puducherry",
-#     "Punjab",
-#     "Sikkim",
-#     "Tamil Nadu",
-#     "Telangana",
-#     "Tripura",
-#     "Uttar Pradesh",
-#     "Uttarakhand",
-#     "West Bengal"
-# ]
-
-# # Season list
-# seasons = [
-#     "Kharif",
-#     "Rabi",
-    
-#     "Summer",
-#     "Autumn",
-#     "Winter",
-
-#     "Whole Year"
-# ]
-
-
-# custom_css = """
-# body, .gradio-container {
-#     background-color: #75b9bf !important; /* Background */
-# }
-# button {
-#     background-color: #caf9fa !important; /* Buttons */
-#     color: black !important;
-#     border-radius: 8px !important;
-#     padding: 8px 16px !important;
-# }
-# button:hover {
-#     background-color: #45a049 !important; /* Darker on hover */
-#     color: white !important;
-# }
-# footer, .svelte-1ipelgc, .svelte-1rjryrr {
-#     display: none !important;
-#     visibility: hidden !important;
-# }
-# #mybox {
-#     background-color: #caf9fa !important;
-#     border-radius: 10px;
-#     padding: 10px;
-# }
-# """
-# with gr.Blocks(css=custom_css) as demo:
-#     with gr.Box(elem_id="mybox"):
-#         gr.Markdown("### Custom Box Color")
-
-# demo = gr.Interface(
-#     fn=predict_crop_yield,
-#     inputs=[
-#         gr.Dropdown(choices=crops, label="Crop",value=None),
-#         gr.Radio(choices=seasons, label="Season"),  # 👈 Replaced with buttons
-#         gr.Dropdown(choices=states, label="State",value=None), # fixed (was mistakenly seasons)
-#         gr.Number(label="Area (in hectares)", value=None, placeholder="Enter area"),
-#         gr.Number(label="Annual Rainfall (mm)", value=None, placeholder="Enter rainfall"),
-#         gr.Number(label="Fertilizer Usage (kg)", value=None, placeholder="Enter fertilizer usage"),
-#         gr.Number(label="Pesticide Usage (kg)", value=None, placeholder="Enter pesticide usage")
-
-#     ],
-#     outputs=gr.Number(label="Predicted Yield"),
-#     css=custom_css,
-#     allow_flagging="never",   
-#     clear_btn=None  
-# )
-
-# demo.launch(debug=True, server_port=8888)
-
-
 import gradio as gr
-from brain_2 import predict_crop_yield
+from brain import predict_crop_yield
 
 # Crop list
 crops = [
@@ -544,23 +386,51 @@ def update_fields(language):
 
 
     
+def predict_with_year(language, crop, season, state, area, rainfall, fertilizer, pesticide, year):
+    """Wrapper to include year parameter"""
+    from brain import predict_crop_yield
+    return predict_crop_yield(language, crop, season, state, area, rainfall, fertilizer, pesticide)
+
+
 with gr.Blocks(css=custom_css) as demo:
-    gr.Markdown("## 🌾 Crop Yield Prediction")
+    gr.Markdown("# 🌾 Fasal Saathi - Crop Yield Prediction")
+    gr.Markdown("### AI-powered crop yield prediction and recommendations for Indian farmers")
 
     with gr.Column(elem_id="mybox"):
-        language = gr.Radio(choices=["English", "Hindi", "Odia"], label="Language")
-        crop = gr.Dropdown(choices=crops, label="Crop")
-        season = gr.Radio(choices=seasons, label="Season")
-        state = gr.Dropdown(choices=states, label="State")
+        with gr.Row():
+            with gr.Column(scale=1):
+                gr.Markdown("### 🌐 Select Language")
+                language = gr.Radio(choices=["English", "Hindi", "Odia"], label="", value="English")
 
-        area = gr.Number(label="Area (in hectares)", value=None)
-        rainfall = gr.Number(label="Annual Rainfall (mm)", value=None)
-        fertilizer = gr.Number(label="Fertilizer Usage (kg)", value=None)
-        pesticide = gr.Number(label="Pesticide Usage (kg)", value=None)
+        with gr.Row():
+            with gr.Column(scale=1):
+                gr.Markdown("### 🌱 Crop Information")
+                crop = gr.Dropdown(choices=crops, label="Crop")
+                season = gr.Radio(choices=seasons, label="Season")
 
-        submit = gr.Button("Predict Yield")
-        output = gr.Number(label="Predicted Yield (t/ha)")
-        advice = gr.Textbox(label="Recommendations", lines=6)
+            with gr.Column(scale=1):
+                gr.Markdown("### 📍 Location")
+                state = gr.Dropdown(choices=states, label="State")
+
+        with gr.Row():
+            with gr.Column(scale=1):
+                gr.Markdown("### 📊 Farm Details")
+                area = gr.Number(label="Area (in hectares)", value=None, minimum=0.1)
+                year_input = gr.Number(label="Year", value=2024, minimum=1997, maximum=2030)
+
+            with gr.Column(scale=1):
+                gr.Markdown("### 🌧️ Input Usage")
+                rainfall = gr.Number(label="Annual Rainfall (mm)", value=None, minimum=0)
+                fertilizer = gr.Number(label="Fertilizer Usage (kg)", value=None, minimum=0)
+                pesticide = gr.Number(label="Pesticide Usage (kg)", value=None, minimum=0)
+
+        submit = gr.Button("🔮 Predict Yield", size="lg")
+
+        with gr.Row():
+            with gr.Column(scale=1):
+                output = gr.Number(label="Predicted Yield (t/ha)", interactive=False)
+            with gr.Column(scale=2):
+                advice = gr.Textbox(label="💡 Recommendations", lines=8, interactive=False)
 
     language.change(
         fn=update_fields,
@@ -569,9 +439,9 @@ with gr.Blocks(css=custom_css) as demo:
     )
 
     submit.click(
-    fn=predict_crop_yield,
-    inputs=[language, crop, season, state, area, rainfall, fertilizer, pesticide],
-    outputs=[output, advice]
-)
+        fn=predict_with_year,
+        inputs=[language, crop, season, state, area, rainfall, fertilizer, pesticide, year_input],
+        outputs=[output, advice]
+    )
 
 demo.launch(debug=True, server_port=8888)
