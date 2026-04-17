@@ -386,12 +386,6 @@ def update_fields(language):
 
 
     
-def predict_with_year(language, crop, season, state, area, rainfall, fertilizer, pesticide, year):
-    """Wrapper to include year parameter"""
-    from brain import predict_crop_yield
-    return predict_crop_yield(language, crop, season, state, area, rainfall, fertilizer, pesticide)
-
-
 with gr.Blocks(css=custom_css) as demo:
     gr.Markdown("# 🌾 Fasal Saathi - Crop Yield Prediction")
     gr.Markdown("### AI-powered crop yield prediction and recommendations for Indian farmers")
@@ -416,7 +410,6 @@ with gr.Blocks(css=custom_css) as demo:
             with gr.Column(scale=1):
                 gr.Markdown("### 📊 Farm Details")
                 area = gr.Number(label="Area (in hectares)", value=None, minimum=0.1)
-                year_input = gr.Number(label="Year", value=2024, minimum=1997, maximum=2030)
 
             with gr.Column(scale=1):
                 gr.Markdown("### 🌧️ Input Usage")
@@ -439,8 +432,8 @@ with gr.Blocks(css=custom_css) as demo:
     )
 
     submit.click(
-        fn=predict_with_year,
-        inputs=[language, crop, season, state, area, rainfall, fertilizer, pesticide, year_input],
+        fn=predict_crop_yield,
+        inputs=[language, crop, season, state, area, rainfall, fertilizer, pesticide],
         outputs=[output, advice]
     )
 

@@ -2,25 +2,11 @@ import joblib
 import pandas as pd
 import numpy as np
 
-# Load the improved model (fixed version - no data leakage)
-try:
-    model_artifacts = joblib.load("improved_model_fixed.pkl")
-    model = model_artifacts['model']
-    label_encoders = model_artifacts['label_encoders']
-    feature_columns = model_artifacts['feature_columns']
-    USE_IMPROVED_MODEL = True
-    print("[OK] Loaded fixed model (improved_model_fixed.pkl)")
-except Exception as e:
-    print(f"[WARNING] Could not load fixed model: {e}")
-    # Fallback to old model
-    try:
-        model = joblib.load("pred_model.pkl")
-        expected_features = model.get_booster().feature_names
-        USE_IMPROVED_MODEL = False
-        print("[OK] Fallback to legacy model")
-    except Exception as e2:
-        print(f"[ERROR] No model available: {e2}")
-        raise
+# Load model v3 only (fixed model without data leakage)
+model_artifacts = joblib.load("pred_model_v3.pkl")
+model = model_artifacts['model']
+label_encoders = model_artifacts['label_encoders']
+feature_columns = model_artifacts['feature_columns']
 
 # Translation dictionaries for recommendations
 recommendations_dict = {
@@ -71,7 +57,7 @@ recommendations_dict = {
     }
 }
 
-def predict_with_improved_model(crop, season, state, area, rainfall, fertilizer, pesticide, year=2020):
+def predict_with_improved_model(crop, season, state, area, rainfall, fertilizer, pesticide, year=2026):
     """Predict using the improved model with engineered features"""
     # Calculate derived features
     fertilizer_per_hectare = fertilizer / area if area > 0 else 0
@@ -143,29 +129,6 @@ def predict_with_improved_model(crop, season, state, area, rainfall, fertilizer,
     prediction = model.predict(df_input)[0]
     return max(0, prediction)
 
-def predict_with_legacy_model(crop, season, state, area, rainfall, fertilizer, pesticide):
-    """Predict using the original model"""
-    input_data = {
-        'Crop': crop,
-        'Season': season,
-        'State': state,
-        'Area': area,
-        'Annual_Rainfall': rainfall,
-        'Fertilizer': fertilizer,
-        'Pesticide': pesticide
-    }
-
-    df = pd.DataFrame([input_data])
-    df_encoded = pd.get_dummies(df)
-
-    for col in expected_features:
-        if col not in df_encoded:
-            df_encoded[col] = 0
-
-    df_encoded = df_encoded[expected_features]
-    prediction = model.predict(df_encoded)[0]
-    return prediction
-
 def generate_recommendations(language, area, rainfall, fertilizer, pesticide):
     """Generate contextual recommendations"""
     recommendations = []
@@ -219,15 +182,9 @@ def predict_crop_yield(language, crop, season, state, area, rainfall, fertilizer
     Returns: (predicted_yield, recommendations)
     """
     try:
-        if USE_IMPROVED_MODEL:
-            prediction = predict_with_improved_model(
-                crop, season, state, area, rainfall, fertilizer, pesticide, year=2020
-            )
-        else:
-            prediction = predict_with_legacy_model(
-                crop, season, state, area, rainfall, fertilizer, pesticide
-            )
-
+        prediction = predict_with_improved_model(
+            crop, season, state, area, rainfall, fertilizer, pesticide, year=2026
+        )
         recommendations = generate_recommendations(language, area, rainfall, fertilizer, pesticide)
         return round(prediction, 4), recommendations
 

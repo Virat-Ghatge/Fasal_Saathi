@@ -1,3 +1,5 @@
+.gitignore
+
 # dataset
 crop_yield.csv
 
@@ -7,3 +9,6 @@ validate_model.py
 retrain_model_fixed.py
 model_evaluation.py
 model_evaluation_results.txt
+
+#claude
+/.claude/
