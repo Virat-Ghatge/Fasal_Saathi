@@ -1,5 +1,9 @@
 import gradio as gr
 from brain import predict_crop_yield
+from weather import (
+    get_current_weather, get_forecast, get_annual_rainfall_estimate,
+    format_weather_for_display, format_forecast_for_display, check_api_keys
+)
 
 # Crop list
 crops = [
@@ -385,7 +389,34 @@ def update_fields(language):
         )
 
 
-    
+# Weather-related functions
+def fetch_weather_data(state):
+    """Fetch weather data when state is selected"""
+    if not state:
+        return "Select a state to see weather", "No forecast available", None
+
+    # Get current weather
+    current = get_current_weather(state)
+    weather_text = format_weather_for_display(current) if current else "Weather API not configured. Please add API key to .env file"
+
+    # Get forecast
+    forecast = get_forecast(state, days=7)
+    forecast_text = format_forecast_for_display(forecast) if forecast else "Forecast unavailable"
+
+    # Get estimated annual rainfall
+    annual_rainfall = get_annual_rainfall_estimate(state)
+
+    return weather_text, forecast_text, annual_rainfall
+
+def update_rainfall_with_weather(state, current_rainfall):
+    """Update rainfall input with estimated annual rainfall"""
+    if not state:
+        return current_rainfall
+
+    estimated = get_annual_rainfall_estimate(state)
+    return estimated
+
+
 with gr.Blocks(css=custom_css) as demo:
     gr.Markdown("# 🌾 Fasal Saathi - Crop Yield Prediction")
     gr.Markdown("### AI-powered crop yield prediction and recommendations for Indian farmers")
@@ -406,16 +437,26 @@ with gr.Blocks(css=custom_css) as demo:
                 gr.Markdown("### 📍 Location")
                 state = gr.Dropdown(choices=states, label="State")
 
-        with gr.Row():
+                # Weather display
+                gr.Markdown("### 🌤️ Weather Information")
+                weather_info = gr.Textbox(label="Current Weather", lines=4, interactive=False)
+                fetch_weather_btn = gr.Button("🔄 Fetch Weather Data", size="sm")
+
             with gr.Column(scale=1):
                 gr.Markdown("### 📊 Farm Details")
                 area = gr.Number(label="Area (in hectares)", value=None, minimum=0.1)
 
-            with gr.Column(scale=1):
                 gr.Markdown("### 🌧️ Input Usage")
                 rainfall = gr.Number(label="Annual Rainfall (mm)", value=None, minimum=0)
+                auto_rainfall_btn = gr.Button("📍 Auto-fill from State", size="sm")
                 fertilizer = gr.Number(label="Fertilizer Usage (kg)", value=None, minimum=0)
                 pesticide = gr.Number(label="Pesticide Usage (kg)", value=None, minimum=0)
+
+        # Weather forecast section
+        with gr.Row():
+            with gr.Column():
+                gr.Markdown("### 📅 7-Day Weather Forecast")
+                forecast_info = gr.Textbox(label="Forecast", lines=10, interactive=False)
 
         submit = gr.Button("🔮 Predict Yield", size="lg")
 
@@ -429,6 +470,25 @@ with gr.Blocks(css=custom_css) as demo:
         fn=update_fields,
         inputs=language,
         outputs=[crop, season, state, area, rainfall, fertilizer, pesticide, submit, output, advice],
+    )
+
+    # Weather data fetching
+    state.change(
+        fn=fetch_weather_data,
+        inputs=state,
+        outputs=[weather_info, forecast_info, rainfall]
+    )
+
+    fetch_weather_btn.click(
+        fn=fetch_weather_data,
+        inputs=state,
+        outputs=[weather_info, forecast_info, rainfall]
+    )
+
+    auto_rainfall_btn.click(
+        fn=update_rainfall_with_weather,
+        inputs=[state, rainfall],
+        outputs=rainfall
     )
 
     submit.click(

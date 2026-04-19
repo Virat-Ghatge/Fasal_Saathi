@@ -1,5 +1,9 @@
 .gitignore
 
+# Environment variables and API keys
+.env
+.env.local
+
 # dataset
 crop_yield.csv
 
