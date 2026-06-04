@@ -497,4 +497,4 @@ with gr.Blocks(css=custom_css) as demo:
         outputs=[output, advice]
     )
 
-demo.launch(debug=True, server_port=8888)
+demo.launch(debug=True)
