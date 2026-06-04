@@ -6,6 +6,7 @@
   [![Framework](https://img.shields.io/badge/UI-Gradio-orange.svg)](https://gradio.app/)
   [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
   [![Hackathon](https://img.shields.io/badge/Smart_India_Hackathon-2023_/_2024-brightgreen.svg)]()
+  [![Live Demo](https://img.shields.io/badge/🤗_Hugging_Face-Live_Demo-FF9D00.svg)](https://huggingface.co/spaces/Virat-Ghatge/Fasal_Saathi)
 </div>
 
 <hr>
@@ -87,7 +88,12 @@ Open the `.env` file and insert your Weather API keys.
 ### 5. Setup Weather API
 Please refer strictly to the [WEATHER_SETUP.md](WEATHER_SETUP.md) file for detailed instructions on acquiring and configuring your OpenWeather or WeatherAPI keys to ensure the live weather features function correctly.
 
-## 💻 Usage
+## 🌐 Live Demo
+
+You can try out the live version of Fasal Saathi without installing anything! It is hosted on Hugging Face Spaces:
+👉 **[Fasal Saathi Live Demo](https://huggingface.co/spaces/Virat-Ghatge/Fasal_Saathi)**
+
+## 💻 Local Usage
 
 To start the local development server, simply run:
 
