@@ -104,13 +104,6 @@ The terminal will output a local URL (typically `http://127.0.0.1:8888`). Open t
 - [ ] **Expanded Language Support:** Adding more regional languages like Tamil, Telugu, Bengali, and Marathi.
 - [ ] **Pest Disease Detection:** A computer vision module to detect crop diseases via smartphone camera uploads.
 
-## 👥 Contributors
-
-- **[Your Name/Teammate 1]** - *Role (e.g., ML Engineer)*
-- **[Teammate 2]** - *Role (e.g., Backend Developer)*
-- **[Teammate 3]** - *Role (e.g., UI/UX & Data Analyst)*
-- **[Teammate 4]** - *Role (e.g., Research & Presentation)*
-
 <div align="center">
   <br>
   <p>Built with ❤️ for the farmers of India.</p>
